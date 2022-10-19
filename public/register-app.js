@@ -1,5 +1,3 @@
-const { default: axios } = require("axios");
-
 const usernameDOM = document.querySelector(".username");
 const passwordDOM = document.querySelector(".password");
 const formDOM = document.querySelector(".register-form");
@@ -15,19 +13,24 @@ formDOM.addEventListener("submit", async (e) => {
     // todo use bootstrap client-side validation for username & password
   }
   //checking if a user with the same username already exists and throwing an error/alert
-  const {
-    data: { users },
-  } = await axios.get("api/v1/library");
-  const all = users.map((user) => {
-    const { name } = user;
-    if (name == uname) {
-      return "<h4>USER ALREADY EXISTS</h4>";
-    }
+  // const {
+  //   data: { users },
+  // } = await axios.get("api/v1/users");
+  // //todo create a get request
+  // const all = users.map((user) => {
+  //   const { name } = user;
+  //   if (name == uname) {
+  //     return "<h4>USER ALREADY EXISTS</h4>";
+  //   }
+  // });
+
+  // formAlertDOM.innerHTML = all;
+
+  await axios.post("api/v1/auth/register", {
+    name: uname,
+    password: pass,
   });
-
-  formAlertDOM.innerHTML = all;
-
-  await axios.post("api/v1/library", { name: uname, password: pass });
+  // await fetch("/api");
   usernameDOM.value = "";
   passwordDOM.value = "";
   formAlertDOM.innerHTML =
