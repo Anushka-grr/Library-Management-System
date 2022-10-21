@@ -27,7 +27,7 @@ formDOM.addEventListener("submit", async (e) => {
   // formAlertDOM.innerHTML = all;
 
   await axios.post("api/v1/auth/register", {
-    name: uname,
+    username: uname,
     password: pass,
   });
   // await fetch("/api");

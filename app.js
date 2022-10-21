@@ -1,15 +1,21 @@
 const config = require("./utils/index.js");
 const express = require("express");
-const app = express();
-const axios = require("axios");
-// routes
-const authRouter = require("./routes/authRouter");
-const connectDB = require("./db/connect");
-// app.use(express.static("./public"));
-app.use(express.json());
-app.use("/api/v1/auth", authRouter);
+const cookieParser = require("cookie-parser");
 
-// Check IIFE :- Immediately invoked function expression
+const authRouter = require("./routes/authRouter");
+const userRouter = require("./routes/userRouter");
+const connectDB = require("./db/connect");
+
+const app = express();
+app.use(express.json());
+app.use(express.static("./public"));
+app.use(cookieParser("test"));
+app.use(express.urlencoded());
+app.use("/api/v1/auth", authRouter);
+//user specific page
+app.use("/api/v1/", userRouter);
+
+//todo Check IIFE :- Immediately invoked function expression
 const start = async () => {
   try {
     connectDB();

@@ -18,6 +18,11 @@ const UserSchema = new mongoose.Schema({
 });
 //encrypting the password using bcryptjs package
 UserSchema.pre("save", async function () {
-  this.password = bcrypt.hashSync(this.password, saltRounds);
+  this.password = await bcrypt.hash(this.password, saltRounds);
 });
+
+UserSchema.methods.comparePassword = async function (userPassword) {
+  const isVerified = await bcrypt.compare(userPassword, this.password);
+  return isVerified;
+};
 module.exports = mongoose.model("User", UserSchema);
