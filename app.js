@@ -4,16 +4,18 @@ const cookieParser = require("cookie-parser");
 
 const authRouter = require("./routes/authRouter");
 const userRouter = require("./routes/userRouter");
+const bookRouter = require("./routes/bookRouter");
 const connectDB = require("./db/connect");
 
 const app = express();
 app.use(express.json());
 app.use(express.static("./public"));
 app.use(cookieParser("test"));
-app.use(express.urlencoded());
 app.use("/api/v1/auth", authRouter);
 //user specific page
-app.use("/api/v1/", userRouter);
+app.use("/api/v1/user", userRouter);
+//book routes
+app.use("/api/v1/books", bookRouter);
 
 //todo Check IIFE :- Immediately invoked function expression
 const start = async () => {
