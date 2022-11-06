@@ -1,10 +1,10 @@
 const jwt = require("jsonwebtoken");
-const { JWT_key } = require("../utils/index");
+const { JWT_key, JWT_LIFETIME } = require("../utils/index");
 const { createTokenUser } = require("./createTokenUser");
 
 const createJWT = (payload) => {
   return jwt.sign(payload, JWT_key, {
-    expiresIn: process.env.JWT_LIFETIME,
+    expiresIn: 360000000,
   });
 };
 /**
@@ -13,16 +13,19 @@ const createJWT = (payload) => {
  */
 const attachCookieToResponse = (res, token) => {
   const JWT_token = createJWT(token);
-  const date = new Date(Date.now() + 1000 * 60 * 60 * 24); // Get current dateTime and add one day to it.
-
+  const date = new Date(Date.now() + 1000 * 60 * 60 * 48); // Get current dateTime and add one day to it.
+  console.log(JWT_token, date);
   res.cookie("token", JWT_token, {
     // Flags the cookie to be accessible only by the web server.
     httpOnly: true,
     // Expiry date of the cookie in GMT. If not specified or set to 0, creates a session cookie.
-    expires: date,
+    // expires: date,
+    expiresIn: "7d",
     // Indicates if the cookie should be signed.
     signed: true,
   });
 };
 
-module.exports = { createJWT, attachCookieToResponse };
+const isTokenValid = (token) => jwt.verify(token, JWT_key);
+
+module.exports = { createJWT, isTokenValid, attachCookieToResponse };

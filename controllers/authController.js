@@ -2,7 +2,6 @@
 const { attachCookieToResponse } = require("../utils/jwt");
 const User = require("../models/users");
 const validator = require("validator");
-const { createTokenUser } = require("../utils/createTokenUser");
 
 const login = async (req, res) => {
   try {
@@ -27,10 +26,13 @@ const login = async (req, res) => {
       userId: savedUser._id,
     };
     console.log(savedUser, user);
-    const token = createTokenUser(user);
+    const token = {
+      userId: user.userId,
+      username: user.username,
+    };
     attachCookieToResponse(res, token);
-    // res.status(200).json(user);
-    res.redirect(`/api/v1/${user.userId}`);
+    res.status(200).json(user);
+    // res.redirect(`/api/v1/${user.userId}`);
   } catch (error) {
     res = {
       err: {
