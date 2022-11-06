@@ -1,18 +1,22 @@
 const mongoose = require("mongoose");
-
-// , bookTitle ,genre, author , publisher , edition, isbn ,issued
-const BookSchema = new mongoose.Schema({
-  isbn: {
-    type: Number,
-    maxLength: [8, "use upto 8 characters"],
-    unique: true,
-    required: true,
-  },
+const genreArray = new mongoose.Schema({
   genre: {
     type: String,
     trim: true,
     enum: ["Fantasy", "Sci-Fi", "Mystery", "Thriller", "Romance"],
   },
+});
+
+// , bookTitle ,genre, author , publisher , edition, isbn ,issued
+const BookSchema = new mongoose.Schema({
+  isbn: {
+    type: Number,
+    min: 10000000,
+    max: 99999999,
+    unique: true,
+    required: [true, "isbn required"],
+  },
+  genreArray: [genreArray],
   author: {
     type: String,
   },
@@ -21,11 +25,12 @@ const BookSchema = new mongoose.Schema({
   },
   bookTitle: {
     type: String,
-    required: true,
+    required: [true, "Book Title Cannot be empty"],
   },
   edition: {
     type: Number,
-    maxLength: [10, "use upto 10 characters"],
+    max: [99999, "use upto 5 characters"],
+    default: 1,
   },
   issued: {
     type: Boolean,

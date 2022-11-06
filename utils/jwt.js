@@ -1,6 +1,5 @@
 const jwt = require("jsonwebtoken");
 const { JWT_key, JWT_LIFETIME } = require("../utils/index");
-const { createTokenUser } = require("./createTokenUser");
 
 const createJWT = (payload) => {
   return jwt.sign(payload, JWT_key, {

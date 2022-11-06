@@ -1,11 +1,18 @@
-//todo get user => if password matches,i.e.,login
 const { attachCookieToResponse } = require("../utils/jwt");
 const User = require("../models/users");
-const validator = require("validator");
+const { validateLogin, validateRegister } = require("../middleware/validator");
 
 const login = async (req, res) => {
   try {
-    const { username, password } = req.body;
+    //validating the user request using joi
+    const { error, value } = validateLogin(req.body);
+    if (error) {
+      return res.status(400).json({
+        message: `${error}`,
+      });
+    }
+    const { username, password } = value;
+
     const savedUser = await User.findOne({ username });
     console.log(savedUser);
     if (!savedUser) {
@@ -25,7 +32,6 @@ const login = async (req, res) => {
       username: savedUser.username,
       userId: savedUser._id,
     };
-    console.log(savedUser, user);
     const token = {
       userId: user.userId,
       username: user.username,
@@ -44,21 +50,15 @@ const login = async (req, res) => {
 };
 const register = async (req, res) => {
   try {
-    console.info("Running register function for user", req.user);
-    //validating username using validator package
-    const { username, password } = req.body;
-    // const uname = details.username;
-
-    //TODO: https://www.npmjs.com/package/joi Use joi for validation instead of manual validations.
-    if (!username || !password) {
+    //validating username using joi package
+    const { error, value } = validateRegister(req.body);
+    if (error) {
       return res.status(400).json({
-        msg: "Username and Password cannot be blank",
+        message: `${error}`,
       });
     }
-    if (!validator.matches(username, "^[a-zA-Z0-9_.]*$")) {
-      return res.status(400).send("Invalid Username");
-    }
-
+    const { username, password } = value;
+    // const uname = details.username;
     const savedUser = await User.findOne({
       username,
     });
@@ -73,15 +73,10 @@ const register = async (req, res) => {
       username,
       password,
     });
-
-    //creating a token for the user
-    // const userToken = {
-    //   userId: user._id.toString(),
-    //   name: user.username,
-    // };
-
-    console.info("Attached cookie to response", req.cookie);
-    const token = createTokenUser(user);
+    const token = {
+      userId: user.userId,
+      username: user.username,
+    };
     attachCookieToResponse(res, token);
     res.status(201).json({
       user: token,
