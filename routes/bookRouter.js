@@ -7,10 +7,11 @@ const {
   editBook,
   getBookStats,
 } = require("../controllers/bookController");
+const { authenticateUser } = require("../middleware/authenticate");
 
-router.route("/").post(postBooks).get(getAllBooks);
+router.route("/").post(authenticateUser, postBooks).get(getAllBooks);
 router.route("/search").get(getBook);
-router.route("/:id").patch(editBook);
+router.route("/:id").patch(authenticateUser, editBook);
 router.route("/inventory").get(getBookStats);
 
 module.exports = router;

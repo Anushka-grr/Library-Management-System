@@ -16,6 +16,7 @@ const authenticateUser = async (req, res, next) => {
       err: {
         code: "",
         message: `${error}`,
+        expired: `${error.expiredAt}`,
       },
     });
   }

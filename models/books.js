@@ -9,6 +9,10 @@ const genreArray = new mongoose.Schema({
 
 // , bookTitle ,genre, author , publisher , edition, isbn ,issued
 const BookSchema = new mongoose.Schema({
+  createdBy: {
+    type: String,
+    required: true,
+  },
   isbn: {
     type: Number,
     min: 10000000,

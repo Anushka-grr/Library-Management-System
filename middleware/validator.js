@@ -30,15 +30,34 @@ const bookSchema = Joi.object({
   ),
   author: Joi.string(),
   publisher: Joi.string(),
+  bookTitle: Joi.string(),
+  edition: Joi.number().max(99999),
+});
+//user validation
+const registerSchema = userSchema;
+const loginSchema = userSchema;
+//book validation
+const getBookSchema = bookSchema;
+const editBookSchema = bookSchema;
+const postBookSchema = Joi.object({
+  _id: Joi.string().alphanum().max(24).min(24),
+  isbn: Joi.number().min(10000000).max(99999999),
+  genreArray: Joi.array().items(
+    Joi.object({
+      genre: Joi.string().valid(
+        "Fantasy",
+        "Sci-Fi",
+        "Mystery",
+        "Thriller",
+        "Romance"
+      ),
+    }).required()
+  ),
+  author: Joi.string(),
+  publisher: Joi.string(),
   bookTitle: Joi.string().required(),
   edition: Joi.number().max(99999),
 });
-
-const registerSchema = userSchema;
-const loginSchema = userSchema;
-const getBookSchema = bookSchema;
-const editBookSchema = bookSchema;
-const postBookSchema = bookSchema;
 
 exports.validateLogin = validator(loginSchema);
 exports.validateRegister = validator(registerSchema);

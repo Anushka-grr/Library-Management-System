@@ -3,7 +3,7 @@ const { JWT_key, JWT_LIFETIME } = require("../utils/index");
 
 const createJWT = (payload) => {
   return jwt.sign(payload, JWT_key, {
-    expiresIn: 360000000,
+    expiresIn: JWT_LIFETIME,
   });
 };
 /**
