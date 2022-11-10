@@ -1,4 +1,6 @@
-const Booking = require("../models/bookings");
+const Booking = require("../models/activeBookings");
+const Book = require("../models/books");
+const BookingHistory = require("../models/bookingHistory");
 const cron = require("node-cron");
 var moment = require("moment");
 const { validateIssueBook } = require("../middleware/validator");
@@ -6,8 +8,6 @@ const { validateIssueBook } = require("../middleware/validator");
 const issueBook = async (req, res) => {
   try {
     const bookId = req.params.id;
-    //todo Better take the booking range (range as in the from and to date for the booking. Let's limit the from and to for 4 hours for now.)
-    //todo validate the req.body date format
     const { error, value } = validateIssueBook(req.body);
     if (error) {
       console.log("Error in validation of requested dates==>", error);
@@ -40,11 +40,19 @@ const issueBook = async (req, res) => {
       const invalid = moment(requestedDates.bookedFrom).isBefore(
         booking.bookedTill
       );
+      /*error=>
+       *currrent booking 25-27  10-14
+       *requsted booking 10-15
+       */
+
       if (invalid) {
         return res.status(200).json({
           message: `Book already issued from ${booking.bookedFrom} to ${booking.bookedTill}`,
         });
       }
+      //11-12 13-14
+      //else push this booking in bookings history model
+      // await BookingHistory.create({ booking });
     }
     //get username and user id from authenticateUser
     const userId = req.user.userId;
@@ -55,11 +63,29 @@ const issueBook = async (req, res) => {
       bookedFrom: requestedDates.bookedFrom,
       bookedTill: requestedDates.bookedTill,
     });
+    //update the number of times the book is issued
+    try {
+      var book = await Book.findById(bookId, "issuedCount");
+      console.log("original issuedCount value in db", book, book.issuedCount);
+      var issuedCount = book.issuedCount;
+      issuedCount++;
+      console.log("IssuedCount after manipulation", issuedCount);
+      await Book.findByIdAndUpdate(bookId, { issuedCount: issuedCount });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        err: {
+          code: ``,
+          message: `${error}`,
+        },
+      });
+    }
+
     console.log(
       `New booking valid from ${newBooking.bookedFrom} to ==>${newBooking.bookedTill}`
     );
-    // TODO: check input for various date formats ,refreshbooks
-    // TODO: We can also update the book object, for eg: number of times the book has been issued.
+    // TODO: refreshbooks
+    //DONE  TODO: We can also update the book object, for eg: number of times the book has been issued.
     // TODO: The user can have a my bookings page, where he can see the past bookings as well as the active bookings.
     return res.status(201).json(newBooking);
   } catch (error) {
@@ -76,4 +102,5 @@ module.exports = {
   issuedBooks,
 };
 
-//todo when bookedTill date passes , delete booking
+//todo if book is issued register the request ==>
+//aftr every issued set to true, update a counter --> this will show number of ooks issued in 30m dYS, CRON JOB S RESET TO ZERO in 30 days ==> but again, where to store this counter / how to access it

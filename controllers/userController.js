@@ -14,5 +14,5 @@ const getAllUsers = async (req, res) => {
     });
   }
 };
-
+const getUserBookings = async (req, res) => {};
 module.exports = { getAllUsers };

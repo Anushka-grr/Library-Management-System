@@ -40,6 +40,11 @@ const BookSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  issuedCount: {
+    type: Number,
+    default: 0,
+    required: true,
+  },
 });
 
 module.exports = mongoose.model("Book", BookSchema);

@@ -1,7 +1,7 @@
 //postBooks, getAllBooks , getBook
 const { db } = require("../models/books");
 const Book = require("../models/books");
-const Booking = require("../models/bookings");
+const Booking = require("../models/activeBookings");
 const User = require("../models/users");
 
 const {
