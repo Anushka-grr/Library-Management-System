@@ -38,7 +38,6 @@ const login = async (req, res) => {
     };
     attachCookieToResponse(res, token);
     res.status(200).json(user);
-    // res.redirect(`/api/v1/${user.userId}`);
   } catch (error) {
     res = {
       err: {
@@ -58,7 +57,6 @@ const register = async (req, res) => {
       });
     }
     const { username, password } = value;
-    // const uname = details.username;
     const savedUser = await User.findOne({
       username,
     });
@@ -67,12 +65,12 @@ const register = async (req, res) => {
         msg: "user exists",
       });
     }
-
     //creating a user in db
     const user = await User.create({
       username,
       password,
     });
+    //creating jwt token for loggen in user
     const token = {
       userId: user.userId,
       username: user.username,
@@ -96,3 +94,5 @@ const register = async (req, res) => {
   }
 };
 module.exports = { login, register };
+
+//TODO: implement jwt refresh tokens

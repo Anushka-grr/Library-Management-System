@@ -1,5 +1,5 @@
-const Booking = require("../models/activeBookings");
 const Book = require("../models/books");
+const Booking = require("../models/activeBookings");
 const BookingHistory = require("../models/bookingHistory");
 const cron = require("node-cron");
 var moment = require("moment");
@@ -14,7 +14,7 @@ const issueBook = async (req, res) => {
       return res.status(400).json({ message: `${error}` });
     }
     const requestedDates = value;
-    //if bookedTill lesser than bookedFom throw error
+    //if bookedTill is before bookedFrom => throw error
     if (requestedDates.bookedTill <= requestedDates.bookedFrom) {
       console.log("Requested dates are ==>", requestedDates);
       return res.status(400).json({
@@ -37,22 +37,23 @@ const issueBook = async (req, res) => {
       console.log(
         `Previous booking valid from ${booking.bookedFrom} to ==>${booking.bookedTill}`
       );
-      const invalid = moment(requestedDates.bookedFrom).isBefore(
+      //checking if requested book from date is invalid
+      const invalidBookedFrom = moment(requestedDates.bookedFrom).isBetween(
+        booking.bookedFrom,
         booking.bookedTill
       );
-      /*error=>
-       *currrent booking 25-27  10-14
-       *requsted booking 10-15
-       */
-
-      if (invalid) {
+      console.log("invalidBookedFrom", invalidBookedFrom);
+      //checking if requested book till date is invalid
+      const invalidBookedTill = moment(requestedDates.bookedTill).isBetween(
+        booking.bookedFrom,
+        booking.bookedTill
+      );
+      console.log("invalidBookedTill", invalidBookedTill);
+      if (invalidBookedFrom || invalidBookedTill) {
         return res.status(200).json({
           message: `Book already issued from ${booking.bookedFrom} to ${booking.bookedTill}`,
         });
       }
-      //11-12 13-14
-      //else push this booking in bookings history model
-      // await BookingHistory.create({ booking });
     }
     //get username and user id from authenticateUser
     const userId = req.user.userId;
@@ -80,13 +81,9 @@ const issueBook = async (req, res) => {
         },
       });
     }
-
     console.log(
       `New booking valid from ${newBooking.bookedFrom} to ==>${newBooking.bookedTill}`
     );
-    // TODO: refreshbooks
-    //DONE  TODO: We can also update the book object, for eg: number of times the book has been issued.
-    // TODO: The user can have a my bookings page, where he can see the past bookings as well as the active bookings.
     return res.status(201).json(newBooking);
   } catch (error) {
     res.json({ message: `${error}` });
@@ -103,4 +100,5 @@ module.exports = {
 };
 
 //todo if book is issued register the request ==>
-//aftr every issued set to true, update a counter --> this will show number of ooks issued in 30m dYS, CRON JOB S RESET TO ZERO in 30 days ==> but again, where to store this counter / how to access it
+//TODO after every issued set to true, update a counter --> this will show number of ooks issued in 30m dYS, CRON JOB S RESET TO ZERO in 30 days ==> but again, where to store this counter / how to access it
+//TODO cron scheduling for refresh

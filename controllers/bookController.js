@@ -1,15 +1,12 @@
-//postBooks, getAllBooks , getBook
 const { db } = require("../models/books");
 const Book = require("../models/books");
 const Booking = require("../models/activeBookings");
 const User = require("../models/users");
-
 const {
   validatePostBook,
   validateEditBook,
   validateGetBook,
 } = require("../middleware/validator");
-// bookTitle ,genre, author , publisher , edition, isbn ,issued
 const postBooks = async (req, res) => {
   try {
     //validating using joi
@@ -43,12 +40,11 @@ const getAllBooks = async (req, res) => {
     });
   }
 };
-
 /**
  * We have 3 variations
- * 1. get by id
- * 2. get by isbn
- * 3. get by anything else (title, genre, etc or union of [title,genre,etc])
+ * 1. get by id => returns a single unique document
+ * 2. get by isbn => returns a single unique document
+ * 3. get by anything else (title, genre, etc or union of [title,genre,etc]) => returns all documents that match the filter
  */
 const getBook = async (req, res) => {
   try {
@@ -95,14 +91,11 @@ const editBook = async (req, res) => {
     const updateBook = value;
     // User x should not be able to update books created by user y.
     const checkUser = await Book.findOne({ _id: id });
-
     if (checkUser.createdBy != req.user.userId) {
       console.info(`Authorized user ==> ${req.user.userId}  `);
       console.info(`Current User ==> ${checkUser.createdBy}`);
-
       return res.status(401).json({ message: "User Not Authorised" });
     }
-
     const book = await Book.findOneAndUpdate({ _id: id }, updateBook, {
       returnDocument: "after", // Will return the new document
     });
@@ -116,13 +109,10 @@ const editBook = async (req, res) => {
     });
   }
 };
-
 const getBookStats = async (req, res) => {
   const issuedBooks = await Booking.find({});
   const allBooks = await Book.find({});
   const users = await User.find({});
-  // todo {total borrowed books in last 30 days,most borrowed book in last 30 days, most requested book (of all times)}
-  //todo clean the data in db
   const result = {
     issuedBooks: issuedBooks.length,
     allBooks: allBooks.length,
@@ -138,3 +128,6 @@ module.exports = {
   editBook,
   getBookStats,
 };
+
+//TODO: In getBookStats => {total borrowed books in last 30 days,most borrowed book in last 30 days, most requested book (of all times)}
+//TODO: clean the data in db

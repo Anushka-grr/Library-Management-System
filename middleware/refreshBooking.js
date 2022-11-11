@@ -7,13 +7,11 @@ const refreshBooks = async (req, res, next) => {
   try {
     // cron.schedule("*****", async () => {
     const activeBooking = await Booking.find({});
-    console.log("activebookings", activeBooking);
+    //checking if any booking has expired
     activeBooking.forEach(async (booking) => {
-      // TODO: https://momentjs.com/ use this library for date.
-
       if (moment(booking.bookedTill).isBefore(moment().format())) {
         console.log("expired booking found", booking);
-        // const bookId = booking.bookId;
+        // adding the expired booking in booking history model
         await BookingHistory.create({
           bookId: booking.bookId,
           bookedFrom: booking.bookedFrom,
@@ -21,19 +19,13 @@ const refreshBooks = async (req, res, next) => {
           bookedBy: booking.bookedBy,
         });
         console.log(
-          "successfully addedd the expired booking in booking history",
+          "successfully added the expired booking in booking history",
           booking
         );
-        const history = await BookingHistory.find({});
-        console.log("updated booking history ==>", history);
-        console.log("deletin...", booking.bookId);
+        //deleting the expired booking from active bookings
+        console.log("deleting...", booking.bookId);
         const deleted = await Booking.deleteOne({ bookId: booking.bookId });
-        const bookings = await Booking.find({});
-        console.log(
-          "succesfully deleted the expired booking, active Bookings Are ==>",
-          bookings,
-          deleted
-        );
+        console.log("succesfully deleted the expired booking ==>", deleted);
       }
     });
     // });
@@ -44,8 +36,3 @@ const refreshBooks = async (req, res, next) => {
 };
 
 module.exports = { refreshBooks };
-
-//cron
-//is before condition bug
-//user bookings
-// limit bookings per user
