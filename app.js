@@ -11,7 +11,6 @@ app.use(express.static("./public"));
 app.use(cookieParser("test"));
 app.use("/api/v1", apiRouter);
 
-//todo Check IIFE :- Immediately invoked function expression
 const start = async () => {
   try {
     connectDB();

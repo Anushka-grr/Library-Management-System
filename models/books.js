@@ -1,4 +1,6 @@
+const { array } = require("joi");
 const mongoose = require("mongoose");
+const User = require("../models/users");
 const genreArray = new mongoose.Schema({
   genre: {
     type: String,
@@ -10,8 +12,13 @@ const genreArray = new mongoose.Schema({
 // , bookTitle ,genre, author , publisher , edition, isbn ,issued
 const BookSchema = new mongoose.Schema({
   createdBy: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
     required: true,
+  },
+  requestedBy: {
+    type: Array,
+    default: [],
   },
   isbn: {
     type: Number,
@@ -36,10 +43,10 @@ const BookSchema = new mongoose.Schema({
     max: [99999, "use upto 5 characters"],
     default: 1,
   },
-  issued: {
-    type: Boolean,
-    default: false,
-  },
+  // issued: {
+  //   type: Boolean,
+  //   default: false,
+  // },
   issuedCount: {
     type: Number,
     default: 0,

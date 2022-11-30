@@ -9,7 +9,11 @@ const authenticateUser = async (req, res, next) => {
   try {
     const user = isTokenValid(token);
     console.log("User authenticated user ===>", user);
-    req.user = { userId: user.userId, username: user.username };
+    req.user = {
+      userId: user.userId,
+      username: user.username,
+      emailId: user.emailId,
+    };
     next();
   } catch (error) {
     res.status(500).json({
